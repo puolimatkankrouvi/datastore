@@ -12,93 +12,67 @@ mongo_url = 'mongodb://pompeli:P0mpel1p0ll0@ds139585.mlab.com:39585/' + database
 var connection = mongoose.connect(mongo_url);
 
 
-var tweetSchema = mongoose.Schema({
+var dataSchema = mongoose.Schema({
 	text: String,
-	username: String,
-	screen_name: String,
-	created_at: String
 
 });
 
-var tweetModel = mongoose.model("TweetModel", tweetSchema);
-
-var tweetCollectionSchema = mongoose.Schema({
-	tweets: [{type: mongoose.Schema.Types.ObjectId , ref:'tweetModel'}],
-});
-
-var tweetCollection = mongoose.model("TweetCollection", tweetCollectionSchema);
+var Data = mongoose.model("DataModel", dataSchema);
 
 
-
-
-function processTweets(tweets_json){
-
-
-	var error = false;
-
-	var tweets = new tweetCollection();
-
-	/*Tweets should be in statuses */
-	if(tweets_json.hasOwnProperty('statuses') ){
-		tweet = new tweetModel();
-		for(i in tweets_json['statuses']){
-
-			status = tweets_json[i];
-
-			console.log(status);
-
-			if(status.hasOwnProperty('created_at')){
-				tweet.created_at = status['created_at'];
-			}
-			else{
-				error = true;
-			}
-
-			if(status.hasOwnProperty('text')){
-				tweet.text = status['text'];
-			}
-			else{
-				error = true;
-			}
-
-
-			if(status.hasOwnProperty('user')){
-				tweet.username = status['user']['name'];
-				tweet.screen_name = status['user']['screen_name'];
-
-			}
-			else{
-				error = true;
-			}
-
-			tweet.save();
-
-			tweets.tweets = tweet;
-
-			tweets.save();
-
-		}
-	}
-	else{
-		error = true;
-	}
-
-	if(error){
-		console.log('Error processing tweets');
-	}
-
-	return tweets;
+function handleError(error){
+	console.log(error);
 }
 
 
-var saveTweets = function(tweets_json){
-	processTweets(tweets_json, (tweets) => {
-		console.log('Tweets saved');
+var createData = function(text){
+	let data = new Data({text: text});
+	data.save( (error) =>{
+		if(error){
+			handleError(error);
+		}
+	}
+	);
+}
 
-		res.send(tweets.json());
+var updateData = function(id, text){
+
+	Data.findById(id, (err, data) => {
+		if(error){
+			handleError(error);
+		}
+
+		data.text = text;
+		data.save( (error) => {
+			if(error){
+				handleError(error);
+			}
+		});
+	});
+
+}
+
+var deleteData = function(id){
+	Data.remove({_id:id} , (error) => {
+		if(error){
+			handleError(error);
+		}
+	});
+}
+
+var readData = function(id){
+	Data.findById(id, (err, data) => {
+		if(error){
+			handleError(error);
+		}
+
+		return data.text;
 	});
 }
 
 module.exports = {
-	saveTweets
+	createData,
+	updateData,
+	deleteData,
+	readData
 }
