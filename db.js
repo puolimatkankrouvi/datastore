@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 
 
-database_name = 'datakanta';
+database_name = 'tietokanta';
 
 //Own computer url
 //mongo_url = 'mongodb://localhost:27017/' + database_name;
