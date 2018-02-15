@@ -13,7 +13,7 @@ var connection = mongoose.connect(mongo_url);
 
 
 var dataSchema = mongoose.Schema({
-	text: String,
+  text: String,
 
 });
 
@@ -21,58 +21,58 @@ var Data = mongoose.model("DataModel", dataSchema);
 
 
 function handleError(error){
-	console.log(error);
+  console.log(error);
 }
 
 
 var createData = function(text){
-	let data = new Data({text: text});
-	data.save( (error) =>{
-		if(error){
-			handleError(error);
-		}
-	}
-	);
+  let data = new Data({text: text});
+  data.save( (error) =>{
+    if(error){
+      handleError(error);
+    }
+  }
+  );
 }
 
 var updateData = function(id, text){
 
-	Data.findById(id, (err, data) => {
-		if(error){
-			handleError(error);
-		}
+  Data.findById(id, (err, data) => {
+    if(error){
+      handleError(error);
+    }
 
-		data.text = text;
-		data.save( (error) => {
-			if(error){
-				handleError(error);
-			}
-		});
-	});
+    data.text = text;
+    data.save( (error) => {
+      if(error){
+        handleError(error);
+      }
+    });
+  });
 
 }
 
 var deleteData = function(id){
-	Data.remove({_id:id} , (error) => {
-		if(error){
-			handleError(error);
-		}
-	});
+  Data.remove({_id:id} , (error) => {
+    if(error){
+      handleError(error);
+    }
+  });
 }
 
 var readData = function(id){
-	Data.findById(id, (err, data) => {
-		if(error){
-			handleError(error);
-		}
+  Data.findById(id, (err, data) => {
+    if(error){
+      handleError(error);
+    }
 
-		return data.text;
-	});
+    return data.text;
+  });
 }
 
 module.exports = {
-	createData,
-	updateData,
-	deleteData,
-	readData
+  createData,
+  updateData,
+  deleteData,
+  readData
 }

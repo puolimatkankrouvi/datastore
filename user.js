@@ -20,13 +20,12 @@ var connection = mongoose.connect(mongo_url, (err) =>{
 
 
 var userSchema = mongoose.Schema({
-	username: {type: String, required: true, index: {unique: true} },
-	password: {type: String, required: true },
+  username: {type: String, required: true, index: {unique: true} },
+  password: {type: String, required: true },
 });
 
 /* This middleware hashes password before saving */
 userSchema.pre( 'save' , function(next,user){
-	console.log(user);
 
     /* Hash the password only if it is new */
     if( !user.isModified('password') ){
@@ -60,10 +59,3 @@ var User = mongoose.model('UserModel', userSchema);
 
 module.exports = {User};
 
-testUser = new User({ username:'kalja2', password:'fjskjkfjskjf33'});
-
-testUser.save( function(err){
-  var user = this;
-
-  console.log(user);
-});
