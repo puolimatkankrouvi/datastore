@@ -8,5 +8,10 @@ const policies = import('policies.js');
 const Abac = new nodeAbac(policies);
 
 
+const read = app.get('/read', function(){
+
+});
+
+
 
 
