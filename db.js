@@ -70,6 +70,16 @@ var readData = function(id){
   });
 }
 
+var getAllData = function(){
+  Data({}, function(err,data){
+    if(error){
+      handleError(error);
+    }
+
+    return data;
+  });
+}
+
 module.exports = {
   createData,
   updateData,

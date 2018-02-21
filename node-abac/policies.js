@@ -8,15 +8,15 @@ const policies = {
       createAttribute: "Can create data",
       updateAttribute: "Can update data"
     }
-  }
+  },
   rules:{
     /* Säännön nimi */
     "can-read":{
       /* Sääntöön tarvittavat attribuutit */
       attributes:{
         "user.readAttribute":{
-          /* Odotettu tulos */
-          comparison_type: boolean,
+          /* Odotettu arvo */
+          comparison_type: "boolean",
           comparison: "boolAnd",
           value: true
         }
@@ -27,7 +27,7 @@ const policies = {
       attributes:{
         "user.removeAttribute":{
           /* Expected compare value of a  */
-          comparison_type: boolean,
+          comparison_type: "boolean",
           comparison: "boolAnd",
           value: true
         }
@@ -38,7 +38,7 @@ const policies = {
       attributes:{
         "user.createAttribute":{
           /* Expected compare value of a  */
-          comparison_type: boolean,
+          comparison_type: "boolean",
           comparison: "boolAnd",
           value: true
         }
@@ -49,7 +49,7 @@ const policies = {
       attributes:{
         "user.updateAttribute":{
           /* Expected compare value of a  */
-          comparison_type: boolean,
+          comparison_type: "boolean",
           comparison: "boolAnd",
           value: true
         }
@@ -58,4 +58,4 @@ const policies = {
   }
 }
 
-module.export(policies);
+module.export = {policies};

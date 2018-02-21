@@ -6,13 +6,15 @@
 
 const app = require('express')();
 const bodyParser = require('body-parser');
-
-
 app.use(bodyParser.urlencoded({extended: true}));
+
+const authRoutes = require('./authRouter.js');
+app.use(authRoutes.read);
+
 const PORT = 8000;
 
 /*
-  Middleware goes here
+  Routes come here
 */
 
 
