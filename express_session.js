@@ -21,7 +21,7 @@ function handleSession(app){
 	}));
 
 	session.Session.prototype.login = function(user, next){
-		this.userInfo = user;
+		this.user = user;
 		next();
 	}
 

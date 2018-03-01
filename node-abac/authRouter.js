@@ -14,7 +14,7 @@ const db = require('../db.js');
   get current user,
   more routes
 */
-const current_user = null;
+var current_user = null;
 
 var unauthorized = function(req,res){
   res.status(401);
@@ -39,8 +39,15 @@ const Abac = new nodeAbac(policies);
 
 /* reititys lukemiseen */
 const read = app.get('/read/:id', function(req,res){
+
+  if(!req.user){
+    res.json({
+      "message": "log in"
+    });
+    return;
+  }
   
-  if( Abac.enforce('can-read', current_user) ){
+  if( Abac.enforce('can-read', req.user) ){
     db.readData(req.params.id, function(data){
       if(data){
       	res.json(
