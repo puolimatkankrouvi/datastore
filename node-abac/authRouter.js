@@ -11,10 +11,8 @@ const db = require('../db.js');
 
 /*
   TODO:
-  get current user,
   more routes
 */
-var current_user = null;
 
 var unauthorized = function(req,res){
   res.status(401);
