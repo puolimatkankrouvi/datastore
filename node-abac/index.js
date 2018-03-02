@@ -18,6 +18,12 @@ const PORT = 8000;
 const authRoutes = require('./authRouter.js');
 app.use(authRoutes.read);
 
+const registerRoutes = require('../express_register.js');
+app.use(
+  registerRoutes.register_get,
+  registerRoutes.register_post
+);
+
 const loginRoutes = require('../express_login.js');
 app.use(
   loginRoutes.logout,

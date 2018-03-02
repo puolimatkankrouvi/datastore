@@ -1,6 +1,11 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 
+/*
+TODO:
+  User database split to username and password?
+*/
+
 
 database_name = 'tietokanta';
 
@@ -22,7 +27,10 @@ var connection = mongoose.connect(mongo_url, (err) =>{
 var userSchema = mongoose.Schema({
   username: {type: String, required: true, index: {unique: true} },
   password: {type: String, required: true },
-  readAttribute{type: Boolean, required: false},
+  readAttribute: {type: Boolean, required: false},
+  createAttribute: {type: Boolean, required: false},
+  updateAttribute: {type: Boolean, required: false},
+  deleteAttribute: {type: Boolean, required: false},
 });
 
 /* This middleware hashes password before saving */
