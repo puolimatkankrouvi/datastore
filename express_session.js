@@ -7,8 +7,8 @@ function handleSession(app){
 
   app.use(session({
 
-  	saveUninitialized: false,
-  	resave: false,
+    saveUninitialized: false,
+    resave: false,
     name:"id",
     secret: crypto.randomBytes(64).toString('hex'),
     cookie:{
@@ -18,12 +18,12 @@ function handleSession(app){
     },
     //Using id instead of default connect.sid makes harder to determine the session mechanism
     name: 'id'
-	}));
+  }));
 
-	session.Session.prototype.login = function(user, next){
-		this.user = user;
-		next();
-	}
+  session.Session.prototype.login = function(user, next){
+	  this.user = user;
+    next();
+  }
 
 }
 

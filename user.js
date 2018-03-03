@@ -34,19 +34,20 @@ var userSchema = mongoose.Schema({
 });
 
 /* This middleware hashes password before saving */
-userSchema.pre( 'save' , function(next,user){
+userSchema.pre( 'save' , function(next){
 
     /* Hash the password only if it is new */
-    if( !user.isModified('password') ){
+    //Buggy?
+    if( !this.isModified('password') ){
       next();
     }
     else{
-      brcypt.genSalt(HASH_SALT_ITERATIONS, function(err, salt){
+      bcrypt.genSalt(HASH_SALT_ITERATIONS, function(err, salt){
         if(err){
           return next(err);
         }
-        bcrypt.hash( user.password, salt, function(err, hashed){
-          user.password = hashed;
+        bcrypt.hash( this.password, salt, function(err, hashed){
+          this.password = hashed;
           next();
         });
       });

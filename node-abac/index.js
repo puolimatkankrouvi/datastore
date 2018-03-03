@@ -9,6 +9,9 @@ const bodyParser = require('body-parser');
 const session = require('../express_session.js').handleSession(app);
 app.use(bodyParser.urlencoded({extended: true}));
 
+
+var session = require('./express_session.js').handleSession(app);
+
 const PORT = 8000;
 
 /*

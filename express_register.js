@@ -36,7 +36,7 @@ var register_post = app.post('/register/', function(req,res){
 	.filter('username', {
 		trim: true
 	})
-	.validate('password', 'Salasanan tulee olla tarpeeksi pitkä', {
+	.validate('pw', 'Salasanan tulee olla tarpeeksi pitkä', {
 		length:{
 			min: config.db_fields.password.min
 		}
@@ -44,25 +44,30 @@ var register_post = app.post('/register/', function(req,res){
 
 
 	req.Validator.getErrors( function(err){
-		if(err){
+		if(err.length > 0){
 			res.redirect('/register', 200, {message:"Invalid username or password"});
 		}
 		else{
+			var readAttribute = req.Validator.getValue('read_attr') == "on" ? true : false;
+			var createAttribute = req.Validator.getValue('create_attr') == "on" ? true : false;
+			var deleteAttribute = req.Validator.getValue('delete_attr') == "on" ? true : false;
+			var updateAttribute = req.Validator.getValue('update_attr') == "on" ? true : false;
 			var newUser = new User({
 				username: req.Validator.getValue('username'),
-			  password: req.Validator.getValue('password'),
-			  readAttribute: reqValidator.getValue('read_attr'),
-			  createAttribute: reqValidator.getValue('create_attr'),
-			  deleteAttribute: reqValidator.getValue('delete_attr'),
-			  updateAttribute: reqValidator.getValue('update_attr')
+			  password: req.Validator.getValue('pw'),
+			  readAttribute: readAttribute,
+			  createAttribute: createAttribute,
+			  deleteAttribute: deleteAttribute,
+			  updateAttribute: updateAttribute
 			});
 			newUser.save( function(err){
 				if(!err){
 					//Should log new user in
-					register_succesful();
+					register_succesfull(res,req);
 				}
 				else{
-					res.redirect('register.pug',{
+					console.log(err);
+					res.redirect('register', 200 ,{
 				    message: err,
 				    username: req.query.username
 			    });
@@ -72,7 +77,7 @@ var register_post = app.post('/register/', function(req,res){
 	});
 });
 
-function register_succesful(){
+function register_succesfull(res,req){
 	res.json({message:"Registered succesfully"});
 }
 
