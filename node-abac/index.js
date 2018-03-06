@@ -24,7 +24,7 @@ app.use(
   registerRoutes.register_post
 );
 
-const loginRoutes = require('../express_login.js');
+const loginRoutes = require('../passport_login.js');
 app.use(
   loginRoutes.logout,
   loginRoutes.login_get,

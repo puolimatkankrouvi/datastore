@@ -11,6 +11,10 @@ var app_config = {
 		password:{
 			min: 4
 		}
+	},
+
+	data_attr:{
+		min_length:1
 	}
 
 }

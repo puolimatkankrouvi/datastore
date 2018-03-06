@@ -3,8 +3,8 @@ var validate = require('form-validate');
 var bodyParser = require('body-parser');
 var config = require('./app_config.js');
 var User = require('./user.js').User;
-var session = require('./express_session.js');
-
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 
 var validator_options = {
 	escapeHTML:true,
@@ -16,6 +16,34 @@ app.use(validate(app,validator_options));
 /*Pug is used for views in templates-folder*/
 app.set('views', __dirname + '/templates/');
 app.set('view engine', 'pug');
+
+passport.use( new LocalStrategy(
+
+  function( username, password, done ){
+  	User.findOne({
+			username: username
+		})
+		.exec( function(error, user){
+			if(error){
+				done(error);
+			}
+			else if(!user){
+				done(null, false,{message: 'Incorrect username or password'});
+			}
+			//User was found, check password
+			user.comparePassword( password, function(err, isMatch){
+				if(isMatch){
+					return done(null,user);
+				}
+				else{
+					done(null, false,{message: 'Incorrect username or password'});
+				}
+			});
+
+		});
+  }
+
+));
 
 
 var logout = app.get('/logout/', function(req,res){
@@ -65,54 +93,21 @@ var login_post = app.post('/login/', function(req,res){
 				}
 				redirect('/login', 200, {message: err});
 			}
-			authenticate(req.Validator.getValue('username'),req.Validator.getValue('pw'),
-				function(err,user){
-				if(err){
-					res.redirect('/login', 200, {message: err});
-				}
-				else
-					if(user){
-						session.login(user, function(){
-							res.json({message:"Logged in successfully"});
-						});
-					}
-			});
+			passport.authenticate('local', 
+				{
+					successRedirect: '/',
+					failureRedirect: '/login',
+					failureFlash: true
+			  },
+			  function(req,res){
+			  	res.json({message: "Login succesful"});
+			  }
+			);
 		});
 });
-
-
-function authenticate(username, password, next){
-		/*
-		  Two part auth,
-		  getting username first
-		*/
-		User.findOne({
-			username: username
-		})
-		.exec( function(error, user){
-			if(error){
-				return next(error);
-			}
-			else if(!user){
-				return next(new Error('User not found'));
-			}
-			//User was found, check password
-			user.comparePassword( password, function(err, isMatch){
-				if(isMatch){
-					return next(null,user);
-				}
-				else{
-					return next(new Error('Invalid username or password') ,null)
-				}
-			});
-
-		});
-};
-
 
 module.exports = ({
 	logout,
 	login_get,
 	login_post
 });
-

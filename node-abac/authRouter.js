@@ -2,9 +2,12 @@
 const express = require('express');
 const app = express();
 const router = express.Router();
+var validate = require('form-validate');
 
 const nodeAbac = require('node-abac');
 const policies = require('./policies.js');
+
+const appConfig = require('../app_config.js');
 
 const db = require('../db.js');
 
@@ -13,6 +16,10 @@ const db = require('../db.js');
   TODO:
   more routes
 */
+
+/*Pug is used for views in templates-folder*/
+app.set('views', __dirname + '/templates/');
+app.set('view engine', 'pug');
 
 var unauthorized = function(req,res){
   res.status(401);
@@ -64,9 +71,68 @@ const read = app.get('/read/:id', function(req,res){
   }
 });
 
+const create_get = app.get('/create',function(req,res){
+  console.log(req.user);
+  if(!req.user){
+    res.json({
+      "message": "log in"
+    });
+    return;
+  }
+  
+  if( Abac.enforce('can-create', req.user) ){
+    res.render('create.pug');
+  }
+  else{
+    unauthorized(err,res);
+  }
+});
+
+const create_post = app.post('/create',function(req,res){
+  if(!req.user){
+    res.json({
+      "message": "log in"
+    });
+    return;
+  }
+  
+  if( Abac.enforce('can-create', req.user) ){
+    req.validator.filter('data_text', {
+      escapeHTML:true,
+      stripTags:true
+    })
+    .validate('data_text',{
+      length:{
+        min:appConfig.data_attr.min_length
+      }
+    });
+
+     req.validator.getErrors( function(validator_errors){
+      //If errors back to create screen
+      if(validator_errors.length > 0){
+        var error = '';
+        for(err in validator_errors){
+          error += err + ' ';
+        }
+        redirect('/create', 200, {message: err});
+      }
+
+      //Insert the data to database
+      db.createData( validator.getValue('data_text') );
+
+     });
+
+  }
+  else{
+    unauthorized(err,res);
+  }
+});
+
 
 module.exports =  {
-	read
+	read,
+  create_get,
+  create_post
 };
 
 
