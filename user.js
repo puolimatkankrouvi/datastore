@@ -10,7 +10,7 @@ TODO:
 database_name = 'tietokanta';
 
 // How many iterations is used to salt the password 
-HASH_SALT_ITERATIONS = 12;
+HASH_SALT_ITERATIONS = 10;
 
 //Own computer url
 //mongo_url = 'mongodb://localhost:27017/' + database_name;
@@ -36,8 +36,9 @@ var userSchema = mongoose.Schema({
 /* This middleware hashes password before saving */
 userSchema.pre( 'save' , function(next){
 
+  var user = this;
+
     /* Hash the password only if it is new */
-    //Buggy?
     if( !this.isModified('password') ){
       next();
     }
@@ -46,8 +47,8 @@ userSchema.pre( 'save' , function(next){
         if(err){
           return next(err);
         }
-        bcrypt.hash( this.password, salt, function(err, hashed){
-          this.password = hashed;
+        bcrypt.hash( user.password, salt, function(err, hashed){
+          user.password = hashed;
           next();
         });
       });
