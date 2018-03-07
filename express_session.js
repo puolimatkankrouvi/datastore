@@ -13,7 +13,7 @@ function handleSession(app){
     secret: crypto.randomBytes(64).toString('hex'),
     cookie:{
       path:'/',
-      maxAge: 1000*60*30, //30 mins
+      maxAge: 1000*60*20, //20 mins
       httpOnly: true,
     },
     //Using id instead of default connect.sid makes harder to determine the session mechanism
@@ -28,4 +28,15 @@ function handleSession(app){
 }
 
 
-module.exports = ({handleSession,})
+
+function userMiddleware(req,res,next){
+  res.locals.user = res.locals.user;
+  console.log('user: ' + res.locals.user);
+  next();
+}
+
+
+module.exports = ({
+  handleSession,
+  userMiddleware
+});

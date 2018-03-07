@@ -5,105 +5,94 @@ var config = require('./app_config.js');
 var User = require('./user.js').User;
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var session = require('./express_session.js');
 
 var validator_options = {
 	escapeHTML:true,
 	stripTags:true
 }
 
+session.handleSession(app);
+
 app.use(validate(app,validator_options));
+app.use(bodyParser.urlencoded({extended: true}));
 
 /*Pug is used for views in templates-folder*/
 app.set('views', __dirname + '/templates/');
 app.set('view engine', 'pug');
 
-passport.use( new LocalStrategy(
-
-  function( username, password, done ){
-  	User.findOne({
-			username: username
-		})
-		.exec( function(error, user){
-			if(error){
-				done(error);
-			}
-			else if(!user){
-				done(null, false,{message: 'Incorrect username or password'});
-			}
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    User.findOne({ username: username }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, {message:'Incorrect username.'});
+      }
 			//User was found, check password
 			user.comparePassword( password, function(err, isMatch){
 				if(isMatch){
-					return done(null,user);
+					//Send user object password so that it does not show up in request
+					passwordless_usr = {
+						username: user.username,
+						readAttribute: user.readAttribute,
+            createAttribute: user.createAttribute,
+            updateAttribute: user.updateAttribute,
+            deleteAttribute: user.deleteAttribute,
+					};
+					return done(null,passwordless_usr);
 				}
 				else{
-					done(null, false,{message: 'Incorrect username or password'});
+					return done(null, false,{message: 'Incorrect username or password'});
 				}
 			});
-
-		});
+    });
   }
-
 ));
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 var logout = app.get('/logout/', function(req,res){
-  if(req.session){
-    req.session.destroy( function(err,res){
-      if(!err){
-        return res.json({message: "Error in logging out"});
-      }
-      else{
-        return res.json({message: "Logout successful"});
-      }
-    });
-	}
-	else{
-    return res.redirect('/login/',200);
-	}
+  req.session.destroy( function(err){
+  	return res.redirect('/login/');
+  });
 });
 
 var login_get = app.get('/login/', function(req,res){
-	if(!res.session){
+	if(!req.user){
 		res.render('login.pug'); 
+	}
+	else{
+		return res.render({message: 'Already logged in'});
 	}
 });
 
-var login_post = app.post('/login/', function(req,res){
-	req.Validator.validate('username', 'Käyttäjänimen tulee olla tarpeeksi pitkä', {
-		length:{
-			min: config.db_fields.username.min,
-			max: config.db_fields.username.max
+var login_post = app.post('/login/', function(req,res,next){
+	passport.authenticate('local', function(err,user,info){
+		if(err){
+			return next(err);
 		}
-	})
-	.filter('username', {
-		trim: true
-	})
-	.validate('password', 'Salasanan tulee olla tarpeeksi pitkä', {
-		length:{
-			min: config.db_fields.password.min
+		if(!user){
+			return res.redirect('/login/');
 		}
-	})
-
-
-	req.Validator.getErrors( function(validator_errors){
-			if(validator_errors.length > 0){
-				var error = '';
-				for(err in validator_errors){
-					error += err + ' ';
-				}
-				redirect('/login', 200, {message: err});
+		req.logIn( user, function(error){
+			if(error){
+				return next(error);
 			}
-			passport.authenticate('local', 
-				{
-					successRedirect: '/',
-					failureRedirect: '/login',
-					failureFlash: true
-			  },
-			  function(req,res){
-			  	res.json({message: "Login succesful"});
-			  }
-			);
+			else{
+				res.json({message: 'Logged in successfully'});
+			}
 		});
+	}) (req,res,next);
 });
 
 module.exports = ({

@@ -72,7 +72,7 @@ const read = app.get('/read/:id', function(req,res){
 });
 
 const create_get = app.get('/create',function(req,res){
-  console.log(req.user);
+  console.log(req);
   if(!req.user){
     res.json({
       "message": "log in"
@@ -89,7 +89,8 @@ const create_get = app.get('/create',function(req,res){
 });
 
 const create_post = app.post('/create',function(req,res){
-  if(!req.user){
+
+  if(!res.locals.user){
     res.json({
       "message": "log in"
     });
