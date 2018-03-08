@@ -2,8 +2,8 @@ extends base.pug
 
 block content
   h Create
-  p #{message}
-  form(method=POST action='/create')
+  p {#message}
+  form(method='POST' action='/create')
     div.form-group
       label(for='data_text')
       input.form-control(type='txt' name='data_text' placeholder='Write data')

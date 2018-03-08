@@ -58,4 +58,4 @@ const policies = {
   }
 }
 
-module.export = {policies};
+module.exports.policies = policies;

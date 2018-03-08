@@ -42,20 +42,22 @@ passport.use(new LocalStrategy(
 ));
 
 passport.serializeUser(function(user, done) {
-	//Send user object without password
-	passwordless_usr = {
-		username: user.username,
-		readAttribute: user.readAttribute,
-    createAttribute: user.createAttribute,
-    updateAttribute: user.updateAttribute,
-    deleteAttribute: user.deleteAttribute,
-	};
+	
   done(null, user._id);
 });
 
 passport.deserializeUser(function(id, done) {
 	User.findOne({'_id':id}, function(err,user){
-	  done(null, user);		
+		//Let's not expose password in user object
+	  passwordless_usr = {
+		  username: user.username,
+		  readAttribute: user.readAttribute,
+      createAttribute: user.createAttribute,
+      updateAttribute: user.updateAttribute,
+      deleteAttribute: user.deleteAttribute,
+	  };
+		//Has user field for node-abac
+	  done(null, {'user': passwordless_usr});		
 	});
 
 });
@@ -77,7 +79,7 @@ var login_get = app.get('/login/', function(req,res){
 		res.render('login.pug'); 
 	}
 	else{
-		return res.render({message: 'Already logged in'});
+		return res.json({message: 'Already logged in'});
 	}
 });
 
@@ -94,7 +96,6 @@ var login_post = app.post('/login/', function(req,res,next){
 				return next(error);
 			}
 			else{
-				console.log(req.session);
 				res.redirect('/login_success');
 			}
 		});

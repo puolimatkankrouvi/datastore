@@ -28,7 +28,7 @@ function handleError(error){
 var createData = function(text){
   let data = new Data({text: text});
   data.save( (error) =>{
-    if(error){
+    if(err){
       handleError(error);
     }
   }
@@ -38,7 +38,7 @@ var createData = function(text){
 var updateData = function(id, text){
 
   Data.findById(id, (err, data) => {
-    if(error){
+    if(err){
       handleError(error);
     }
 
@@ -62,7 +62,7 @@ var deleteData = function(id){
 
 var readData = function(id){
   Data.findById(id, (err, data) => {
-    if(error){
+    if(err){
       handleError(error);
     }
 
@@ -70,13 +70,12 @@ var readData = function(id){
   });
 }
 
-var getAllData = function(){
-  Data({}, function(err,data){
-    if(error){
-      handleError(error);
+var getAllData = function(next){
+  Data.find({}, function(err,data){
+    if(err){
+      handleError(err);
     }
-
-    return data;
+    next(err,data);
   });
 }
 
@@ -84,5 +83,6 @@ module.exports = {
   createData,
   updateData,
   deleteData,
-  readData
+  readData,
+  getAllData
 }

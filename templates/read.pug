@@ -1,0 +1,9 @@
+extends base.pug
+
+
+block content
+  h Data
+  ul.list-group
+    each val in {data}
+      each elem in val
+        li.list-group-item=elem.text

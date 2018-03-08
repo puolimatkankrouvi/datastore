@@ -5,7 +5,7 @@ const router = express.Router();
 var validate = require('form-validate');
 
 const nodeAbac = require('node-abac');
-const policies = require('./policies.js');
+const policies = require('./policies.js').policies;
 
 const session = require('../express_session');
 
@@ -19,11 +19,11 @@ const db = require('../db.js');
   more routes
 */
 
-session.handleSession(app);
-
 /*Pug is used for views in templates-folder*/
-app.set('views', __dirname + '/templates/');
+app.set('views', __dirname + '/../templates/');
 app.set('view engine', 'pug');
+
+app.use(validate());
 
 var unauthorized = function(req,res){
   res.status(401);
@@ -47,23 +47,18 @@ var not_found = function(req, res){
 const Abac = new nodeAbac(policies);
 
 /* reititys lukemiseen */
-const read = app.get('/read/:id', function(req,res){
+const read = app.get('/read/', function(req,res){
 
   if(!req.user){
     res.json({
       "message": "log in"
     });
-    return;
   }
   
   if( Abac.enforce('can-read', req.user) ){
-    db.readData(req.params.id, function(data){
+    db.getAllData( function(err,data){
       if(data){
-      	res.json(
-      	  {
-      	    "data": data
-      	  }
-      	);
+        res.render('read.pug',{'data':data});
       }
       else{
       	not_found(req,res);
@@ -82,8 +77,6 @@ const create_get = app.get('/create',function(req,res){
     });
     return;
   }
-  console.log(Abac);
-  //rule = self._policy.getRules()[rule_name]; fails
   if( Abac.enforce('can-create', req.user) ){
     res.render('create.pug');
   }
@@ -93,8 +86,7 @@ const create_get = app.get('/create',function(req,res){
 });
 
 const create_post = app.post('/create',function(req,res){
-
-  if(!res.locals.user){
+  if(!req.user){
     res.json({
       "message": "log in"
     });
@@ -102,7 +94,7 @@ const create_post = app.post('/create',function(req,res){
   }
   
   if( Abac.enforce('can-create', req.user) ){
-    req.validator.filter('data_text', {
+    req.Validator.filter('data_text', {
       escapeHTML:true,
       stripTags:true
     })
@@ -112,18 +104,20 @@ const create_post = app.post('/create',function(req,res){
       }
     });
 
-     req.validator.getErrors( function(validator_errors){
+     req.Validator.getErrors( function(validator_errors){
       //If errors back to create screen
       if(validator_errors.length > 0){
         var error = '';
         for(err in validator_errors){
           error += err + ' ';
         }
-        redirect('/create', 200, {message: err});
+        redirect('/create', 200, {message: error});
       }
 
       //Insert the data to database
-      db.createData( validator.getValue('data_text') );
+      db.createData( req.Validator.getValue('data_text') );
+
+      res.json('Data added');
 
      });
 
