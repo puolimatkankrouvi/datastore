@@ -7,6 +7,8 @@ var validate = require('form-validate');
 const nodeAbac = require('node-abac');
 const policies = require('./policies.js');
 
+const session = require('../express_session');
+
 const appConfig = require('../app_config.js');
 
 const db = require('../db.js');
@@ -16,6 +18,8 @@ const db = require('../db.js');
   TODO:
   more routes
 */
+
+session.handleSession(app);
 
 /*Pug is used for views in templates-folder*/
 app.set('views', __dirname + '/templates/');
@@ -72,14 +76,14 @@ const read = app.get('/read/:id', function(req,res){
 });
 
 const create_get = app.get('/create',function(req,res){
-  console.log(req);
   if(!req.user){
     res.json({
       "message": "log in"
     });
     return;
   }
-  
+  console.log(Abac);
+  //rule = self._policy.getRules()[rule_name]; fails
   if( Abac.enforce('can-create', req.user) ){
     res.render('create.pug');
   }

@@ -2,14 +2,12 @@ const crypto = require('crypto');
 const session = require('express-session');
 
 
-
 function handleSession(app){
 
   app.use(session({
 
     saveUninitialized: false,
     resave: false,
-    name:"id",
     secret: crypto.randomBytes(64).toString('hex'),
     cookie:{
       path:'/',
@@ -30,7 +28,7 @@ function handleSession(app){
 
 
 function userMiddleware(req,res,next){
-  res.locals.user = res.locals.user;
+  res.locals.user = req.user;
   console.log('user: ' + res.locals.user);
   next();
 }

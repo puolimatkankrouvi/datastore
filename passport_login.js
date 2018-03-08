@@ -12,10 +12,10 @@ var validator_options = {
 	stripTags:true
 }
 
-session.handleSession(app);
-
 app.use(validate(app,validator_options));
 app.use(bodyParser.urlencoded({extended: true}));
+
+session.handleSession(app);
 
 /*Pug is used for views in templates-folder*/
 app.set('views', __dirname + '/templates/');
@@ -26,20 +26,12 @@ passport.use(new LocalStrategy(
     User.findOne({ username: username }, function (err, user) {
       if (err) { return done(err); }
       if (!user) {
-        return done(null, false, {message:'Incorrect username.'});
+        return done(null, false, {message:'Incorrect username or password'});
       }
 			//User was found, check password
 			user.comparePassword( password, function(err, isMatch){
 				if(isMatch){
-					//Send user object password so that it does not show up in request
-					passwordless_usr = {
-						username: user.username,
-						readAttribute: user.readAttribute,
-            createAttribute: user.createAttribute,
-            updateAttribute: user.updateAttribute,
-            deleteAttribute: user.deleteAttribute,
-					};
-					return done(null,passwordless_usr);
+					return done(null,user);
 				}
 				else{
 					return done(null, false,{message: 'Incorrect username or password'});
@@ -50,15 +42,28 @@ passport.use(new LocalStrategy(
 ));
 
 passport.serializeUser(function(user, done) {
-  done(null, user);
+	//Send user object without password
+	passwordless_usr = {
+		username: user.username,
+		readAttribute: user.readAttribute,
+    createAttribute: user.createAttribute,
+    updateAttribute: user.updateAttribute,
+    deleteAttribute: user.deleteAttribute,
+	};
+  done(null, user._id);
 });
 
-passport.deserializeUser(function(user, done) {
-  done(null, user);
+passport.deserializeUser(function(id, done) {
+	User.findOne({'_id':id}, function(err,user){
+	  done(null, user);		
+	});
+
 });
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+//app.use(session.userMiddleware);
 
 
 var logout = app.get('/logout/', function(req,res){
@@ -89,14 +94,20 @@ var login_post = app.post('/login/', function(req,res,next){
 				return next(error);
 			}
 			else{
-				res.json({message: 'Logged in successfully'});
+				console.log(req.session);
+				res.redirect('/login_success');
 			}
 		});
 	}) (req,res,next);
 });
 
+var index = app.get('/login_success',function(req,res){
+	res.json({message: 'Logged in successfully'});
+});
+
 module.exports = ({
 	logout,
 	login_get,
-	login_post
+	login_post,
+	index
 });
