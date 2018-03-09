@@ -2,8 +2,9 @@ extends base.pug
 
 
 block content
-  h Data
+  h1 Data
   ul.list-group
-    each val in {data}
-      each elem in val
-        li.list-group-item=elem.text
+    each array in {data}
+      each val in array
+        li.list-group-item=val.text
+        a(href='edit/' + val.id + '/') Edit

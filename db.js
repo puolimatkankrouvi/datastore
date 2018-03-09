@@ -60,13 +60,13 @@ var deleteData = function(id){
   });
 }
 
-var readData = function(id){
+var readData = function(id,next){
   Data.findById(id, (err, data) => {
     if(err){
-      handleError(error);
+      next(err,null);
     }
 
-    return data.text;
+    next(null,data);
   });
 }
 
