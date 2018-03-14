@@ -32,15 +32,6 @@ function handleSession(app){
 }
 
 
-
-function userMiddleware(req,res,next){
-  res.locals.user = req.user;
-  console.log('user: ' + res.locals.user);
-  next();
-}
-
-
 module.exports = ({
-  handleSession,
-  userMiddleware
+  handleSession
 });

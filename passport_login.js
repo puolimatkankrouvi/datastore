@@ -65,8 +65,6 @@ passport.deserializeUser(function(id, done) {
 app.use(passport.initialize());
 app.use(passport.session());
 
-//app.use(session.userMiddleware);
-
 
 var logout = app.get('/logout/', function(req,res){
   req.session.destroy( function(err){
@@ -102,7 +100,7 @@ var login_post = app.post('/login/', function(req,res,next){
 	}) (req,res,next);
 });
 
-var index = app.get('/login_success',function(req,res){
+var login_success = app.get('/login_success',function(req,res){
 	res.json({message: 'Logged in successfully'});
 });
 
@@ -110,5 +108,5 @@ module.exports = ({
 	logout,
 	login_get,
 	login_post,
-	index
+	login_success
 });
