@@ -27,19 +27,19 @@ app.use(validate());
 
 var unauthorized = function(req,res){
   res.status(401);
-  res.json(
+  return res.json(
     {
       'message': 'Unauthorized 401'
-    });
+    }
+  );
 };
 
 var not_found = function(req, res){
-    res.status(404);
-    res.json(
-      {
-        'message':'Not found 404'
-      }
-    );
+  res.status(404);
+  return res.json({
+    'message':'Not found 404'
+    }
+  );
 };
 
 

@@ -12,19 +12,28 @@ app.set('view engine', 'pug');
 
 var unauthorized = function(req,res){
   res.status(401);
-  res.json(
+  return res.json(
     {
       'message': 'Unauthorized 401'
     });
 };
 
 var not_found = function(req, res){
-    res.status(404);
-    res.json(
-      {
-        'message':'Not found 404'
-      }
-    );
+  res.status(404);
+  return res.json('Not found 404');
+};
+
+
+
+function readData(req,res){
+	db.getAllData( function(err,data){
+	  if(data){
+      res.render('read.pug',{'data':data});
+    }
+    else{
+      not_found(req,res);
+    }
+  });
 };
 
 //Serverin tunniste
@@ -32,50 +41,40 @@ const NAME = app_config.server_name;
 //Abac käyttöön
 const abac = require('abac');
 
-//Added policies
+//Politiikat
 abac.set_policy(NAME, 'delete', function(req){
-	return (req.user.deleteAttribute == true ? true : false);
+	return (req.user.user.deleteAttribute == true ? true : false);
 });
 abac.set_policy(NAME, 'update', function(req){
-	return (req.user.updateAttribute == true ? true : false);
+	return (req.user.user.updateAttribute == true ? true : false);
 });
 abac.set_policy(NAME, 'create', function(req){
-	return (req.user.createAttribute == true ? true : false);
+	return (req.user.user.createAttribute == true ? true : false);
 });
 abac.set_policy(NAME, 'read', function(req){
-	if(req.user.readAttribute == true){
-		return true;
-	}
-	else{
-		return false;
-	}
+	return (req.user.user.readAttribute == true ? true : false);
 });
 
 /* reititys lukemiseen */
-const read = app.get('/read/', function(req,res){
+const read = app.get('/', function(req, res, next){
 
 	if(!req.user){
-		return res.json('Log in');
+		return res.redirect('/login');
 	}
 
-  db.getAllData( function(err,data){
-  	console.log(data);
-  	abac.can(NAME,'read', req.user, {
-      yes: function() {
-      
-        if(data){
-          res.render('read.pug',{'data':data});
-        }
-        else{
-      	  not_found(req,res);
-        }
-      },
-      no: function(err, info) {
-        unauthorized(err,res);
-      }
-    }) (req,res);
-  });
+  abac.can(NAME, 'read', {
+    yes: function() {
+      readData(req,res);
+    },
+    no: function(err, info) {
+      unauthorized(req,res); 
+    }
+  })(req, res);
 });
+
+
+
+
 
 
 module.exports = ({read});
