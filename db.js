@@ -9,7 +9,7 @@ database_name = 'tietokanta';
 
 //Heroku url
 mongo_url = 'mongodb://pompeli:P0mpel1p0ll0@ds139585.mlab.com:39585/' + database_name
-var connection = mongoose.connect(mongo_url);
+var client = mongoose.connect(mongo_url);
 
 
 var dataSchema = mongoose.Schema({
@@ -84,5 +84,6 @@ module.exports = {
   updateData,
   deleteData,
   readData,
-  getAllData
+  getAllData,
+  client
 }

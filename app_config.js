@@ -2,6 +2,7 @@
 
 var app_config = {
 
+	server_name: 'in-memory',
 
 	db_fields:{
 		username: {

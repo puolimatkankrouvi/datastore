@@ -1,3 +1,5 @@
+var express = require('express');
+
 
 /*
   Express.js
@@ -16,6 +18,27 @@ const PORT = 8000;
 */
 
 
+/*Pug is used for views in templates-folder*/
+app.set('views', __dirname + '/../templates/');
+app.set('view engine', 'pug');
+
+var unauthorized = function(req,res){
+  res.status(401);
+  res.json(
+    {
+      'message': 'Unauthorized 401'
+    });
+};
+
+var not_found = function(req, res){
+    res.status(404);
+    res.json(
+      {
+        'message':'Not found 404'
+      }
+    );
+};
+
 const loginRoutes = require('../passport_login.js');
 app.use(
   loginRoutes.logout,
@@ -23,7 +46,10 @@ app.use(
   loginRoutes.login_post
 );
 
-
+const authRoutes = require('./abacRoutes.js');
+app.use(
+	authRoutes.read,
+);
 
 const registerRoutes = require('../express_register.js');
 app.use(

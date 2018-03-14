@@ -16,7 +16,7 @@ const db = require('../db.js');
 
 /*
   TODO:
-  more routes
+  delete route
 */
 
 /*Pug is used for views in templates-folder*/
