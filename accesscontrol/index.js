@@ -23,8 +23,10 @@ app.use(
   loginRoutes.login_post
 );
 
-const authRoutes = require('./abacRoutes.js');
-
+const authRoutes = require('./acRoutes.js');
+app.use(
+	authRoutes.read
+);
 
 const registerRoutes = require('../express_register.js');
 app.use(
