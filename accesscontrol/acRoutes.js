@@ -23,7 +23,6 @@ var not_found = function(req, res){
   return res.json('Not found 404');
 };
 
-
 const ac = new AccessControl();
 
 // Käyttäjärooli
@@ -34,15 +33,12 @@ ac.grant('user')
   .readAny('data')
   .updateAny('data');
 
-
-/* reititys lukemiseen */
+/* Reititys lukemiseen */
 const read = app.get('/', function(req, res, next){
-
 	if(!req.user){
     return res.redirect('/login');
   }
-  //
-  console.log(req.user.user);
+
 	const permission = ac.can(req.user.user.role).readAny('data');
 
 	if(permission.granted){
@@ -72,9 +68,9 @@ const update_post = app.post('/edit/:id', function(req,res,next){
   if(!req.user){
     return res.redirect('/login');
   }
-  const permission = ac.can(req.user.user.role).editAny('data');
+  const permission = ac.can(req.user.user.role).updateAny('data');
   if(permission.granted){
-    updateGet(req,res);  	
+    updateData(req,res);  	
   }
   else{
     unauthorized(req,res);  	

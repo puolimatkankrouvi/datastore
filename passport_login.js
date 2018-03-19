@@ -55,7 +55,7 @@ passport.deserializeUser(function(id, done) {
       createAttribute: user.createAttribute,
       updateAttribute: user.updateAttribute,
       deleteAttribute: user.deleteAttribute,
-      role: user.role,
+      role: user.role
 	  };
 		//Has user field for node-abac
 	  done(null, {'user': passwordless_usr});		

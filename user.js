@@ -31,6 +31,7 @@ var userSchema = mongoose.Schema({
   createAttribute: {type: Boolean, required: false},
   updateAttribute: {type: Boolean, required: false},
   deleteAttribute: {type: Boolean, required: false},
+  role: {type: String, required: false}
 });
 
 /* This middleware hashes password before saving */
