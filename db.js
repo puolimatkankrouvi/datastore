@@ -28,7 +28,8 @@ function handleError(error){
 var createData = function(text){
   let data = new Data({text: text});
   data.save( (error) =>{
-    if(err){
+    if(error){
+      console.log(error);
       handleError(error);
     }
   }
@@ -39,7 +40,7 @@ var updateData = function(id, text){
 
   Data.findById(id, (err, data) => {
     if(err){
-      handleError(error);
+      handleError(err);
     }
 
     data.text = text;
