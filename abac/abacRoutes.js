@@ -57,7 +57,6 @@ abac.set_policy(NAME, 'read', function(req){
 
 /* reititys lukemiseen */
 const read = app.get('/', function(req, res, next){
-
 	if(!req.user){
 		return res.redirect('/login');
 	}

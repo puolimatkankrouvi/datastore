@@ -57,6 +57,7 @@ app.use(
   registerRoutes.register_post
 );
 
+app.disable('trust proxy');
 
 app.listen(PORT, () => {
   console.log('App running at localhost://%d', PORT);
